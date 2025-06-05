@@ -38,7 +38,7 @@ if __name__ == "__main__":
         last_step=2000,  # Time step to stop simulation
     )
     
-new_u, new_v = update(u, v, params)
-timestr = time.strftime("%Y%m%d-%H%M%S")
-np.savetxt('u_matrix_'+timestr+'.txt',new_u,fmt='%.32f')
-np.savetxt('v_matrix_'+timestr+'.txt',new_v,fmt='%.32f')
+    new_u, new_v = update(u, v, params)
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    np.savetxt('u_matrix_'+timestr+'.txt',new_u,fmt='%.32f')
+    np.savetxt('v_matrix_'+timestr+'.txt',new_v,fmt='%.32f')
