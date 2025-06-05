@@ -6,10 +6,9 @@ from multiprocessing import Pool
 import math
 import time
 
-from utils.DataFileManagement import *
-from utils.ParameterObject import *
-from utils.PerturbationApplication import *
-from utils.SimCompModifiedFHN import *
+from DataFileManagement import *
+from ParameterObject import *
+from SimCompModifiedFHN import *
 
 if __name__ == "__main__":
     #filename = '[insertname].csv'
