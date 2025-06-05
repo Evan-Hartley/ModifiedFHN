@@ -12,7 +12,7 @@ def laplacian(Z, params):
 def fitzhugh_nagumo(u, v, params):
     lap_u = laplacian(u, params)
     u_new = u + params.dt * (params.D_u * lap_u + params.mu * u * (1 - u) * (u - params.alpha) - v * u)
-    v_new = v + params.dt * (params.eps * ((params.beta - u) * (u - params.gamma) - params.delta*v - params.theta))
+    v_new = v + params.dt * (params.epsilon * ((params.beta - u) * (u - params.gamma) - params.delta*v - params.theta))
 
     # Apply no-flux boundary conditions
     u_new[0, :] = u_new[1, :]
