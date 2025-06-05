@@ -13,8 +13,8 @@ from SimCompModifiedFHN import *
 if __name__ == "__main__":
     #filename = '[insertname].csv'
     #[u, v] = LoadAndProcessCsv(filename)
-    u = np.zeros=((512,512))
-    v = np.zeros=((512,512))
+    u = np.zeros((512,512))
+    v = np.zeros((512,512))
 
     # Set initial conditions for a planar wave
     for i in range(50):
