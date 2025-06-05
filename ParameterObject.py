@@ -1,5 +1,5 @@
 class Params:
-    def __init__(self, D_u, alpha, beta, epsilon, mu, gamma, theta, delta, dt, dx, nx, ny, last_step, perturb_step):
+    def __init__(self, D_u, alpha, beta, epsilon, mu, gamma, theta, delta, dt, dx, nx, ny, last_step):
         self.D_u = D_u
         self.alpha = alpha
         self.beta = beta
