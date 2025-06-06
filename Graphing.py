@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import time
 
-def plot_heatmap(u, v, t, params, ax=None, colors_volt='RdYlBu_r'):
+def plot_heatmap(u, v, t, ax=None, colors_volt='RdYlBu_r'):
     if ax is None:
         fig, ax = plt.subplots()  # create new axis if not provided
         created_fig = True
@@ -11,7 +11,7 @@ def plot_heatmap(u, v, t, params, ax=None, colors_volt='RdYlBu_r'):
     heatmap = ax.imshow(u, cmap=colors_volt, origin='lower', vmin=-0.4, vmax=1.2)
     plt.colorbar(heatmap, location='left', ax=ax, fraction=0.046, pad=0.04, label="Normalized Voltage")
 
-    ax.set_title(f'Voltage Map at {round(round(t) * params.dt,2)} ms', fontsize=24)
+    ax.set_title(f'Voltage Map at t = {round(t,2)} ms', fontsize=24)
     ax.set_xlabel('x-space', fontsize=16)
     ax.set_ylabel('y-space', fontsize=16)
     ax.axis('off')
