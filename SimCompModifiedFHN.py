@@ -74,4 +74,7 @@ def update(u, v, params, perturb):
             args = [(u_chunks[i], v_chunks[i], params) for i in range(len(u_chunks))]
             u, v = run_fitzhugh_nagumo(fitzhugh_nagumo, args, pool)
 
+            if np.any(np.isclose(t, params.graph_times, atol=1e-8)):
+                plot_heatmap(u, v, t)
+
     return u, v
