@@ -27,17 +27,43 @@ def fitzhugh_nagumo(u, v, params):
 
     return u_new, v_new
 
-def run_fitzhugh_nagumo(operation, args, pool):
-    results = pool.starmap(fitzhugh_nagumo, args)
-    u = np.vstack([r[0] for r in results])
-    v = np.vstack([r[1] for r in results])
+def run_fitzhugh_nagumo(func, args, pool):
+    if len(args) == 0:
+        raise ValueError("No arguments provided to pool. Check chunking logic.")
+
+    results = pool.starmap(func, args)
+
+    if not results:
+        raise ValueError("Parallel processing returned no results.")
+
+    try:
+        u = np.vstack([r[0] for r in results])
+        v = np.vstack([r[1] for r in results])
+    except Exception as e:
+        print("Error combining results:", e)
+        raise
+
     return u, v
 
+
 def split_array(arr, num_chunks):
-    return np.array_split(arr, num_chunks, axis=0)
+    rows = arr.shape[0]
+    chunk_size = rows // num_chunks
+    remainder = rows % num_chunks
+    chunks = []
+    start = 0
+
+    for i in range(num_chunks):
+        extra = 1 if i < remainder else 0
+        end = start + chunk_size + extra
+        if end > start:
+            chunks.append(arr[start:end].copy())
+        start = end
+
+    return chunks
 
 @timebudget
-def update(u, v, params):
+def update(u, v, params, perturb):
     results = []
     processes_count = 8
 
@@ -45,7 +71,7 @@ def update(u, v, params):
         for t in np.arange(0, params.last_step, params.dt):
             u_chunks = split_array(u, processes_count)
             v_chunks = split_array(v, processes_count)
-            args = [(u_chunks[i], v_chunks[i], params) for i in range(processes_count)]
+            args = [(u_chunks[i], v_chunks[i], params) for i in range(len(u_chunks))]
             u, v = run_fitzhugh_nagumo(fitzhugh_nagumo, args, pool)
 
     return u, v
