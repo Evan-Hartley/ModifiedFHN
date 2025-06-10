@@ -28,20 +28,27 @@ def fitzhugh_nagumo(u, v, params):
     return u_new, v_new
 
 def run_fitzhugh_nagumo(func, args, pool):
-    if len(args) == 0:
-        raise ValueError("No arguments provided to pool. Check chunking logic.")
-
     results = pool.starmap(func, args)
 
-    if not results:
-        raise ValueError("Parallel processing returned no results.")
+    trimmed_u = []
+    trimmed_v = []
 
-    try:
-        u = np.vstack([r[0] for r in results])
-        v = np.vstack([r[1] for r in results])
-    except Exception as e:
-        print("Error combining results:", e)
-        raise
+    for u_chunk, v_chunk, start, end in results:
+        if start == 0:
+            u_trimmed = u_chunk[:end - start]
+            v_trimmed = v_chunk[:end - start]
+        elif end == args[-1][4]:  # args[i][4] is the `end` index
+            u_trimmed = u_chunk[1:]
+            v_trimmed = v_chunk[1:]
+        else:
+            u_trimmed = u_chunk[1:-1]
+            v_trimmed = v_chunk[1:-1]
+
+        trimmed_u.append(u_trimmed)
+        trimmed_v.append(v_trimmed)
+
+    u = np.vstack(trimmed_u)
+    v = np.vstack(trimmed_v)
 
     return u, v
 
@@ -56,8 +63,12 @@ def split_array(arr, num_chunks):
     for i in range(num_chunks):
         extra = 1 if i < remainder else 0
         end = start + chunk_size + extra
-        if end > start:
-            chunks.append(arr[start:end].copy())
+
+        # Add ghost rows
+        top = max(start - 1, 0)
+        bottom = min(end + 1, rows)
+        chunk = arr[top:bottom].copy()
+        chunks.append((chunk, start, end))  # Keep track of original indices
         start = end
 
     return chunks
@@ -71,7 +82,7 @@ def update(u, v, params, perturb):
         for t in np.arange(0, params.last_step, params.dt):
             u_chunks = split_array(u, processes_count)
             v_chunks = split_array(v, processes_count)
-            args = [(u_chunks[i], v_chunks[i], params) for i in range(len(u_chunks))]
+            args = [(u_chunks[i][0], v_chunks[i][0], params, u_chunks[i][1], u_chunks[i][2]) for i in range(len(u_chunks))]
             u, v = run_fitzhugh_nagumo(fitzhugh_nagumo, args, pool)
 
             if np.any(np.isclose(t, params.graph_times, atol=1e-8)):
