@@ -1,6 +1,10 @@
 import numpy as np
 from timebudget import timebudget
+import os
 from multiprocessing import Pool
+
+from utils.PerturbationApplication import *
+from utils.GraphCheck import *
 
 def laplacian(Z, params):
     Z_top = np.roll(Z, 1, axis=0)
@@ -9,8 +13,10 @@ def laplacian(Z, params):
     Z_right = np.roll(Z, -1, axis=1)
     return (Z_top + Z_bottom + Z_left + Z_right - 4 * Z) / (params.dx ** 2)
 
-def fitzhugh_nagumo(u, v, params):
+def fitzhugh_nagumo(u, v, params, start, end):
+
     lap_u = laplacian(u, params)
+   
     u_new = u + params.dt * (params.D_u * lap_u + params.mu * u * (1 - u) * (u - params.alpha) - v * u)
     v_new = v + params.dt * (params.epsilon * ((params.beta - u) * (u - params.gamma) - params.delta*v - params.theta))
 
@@ -25,9 +31,9 @@ def fitzhugh_nagumo(u, v, params):
     v_new[:, 0] = v_new[:, 1]
     v_new[:, -1] = v_new[:, -2]
 
-    return u_new, v_new
+    return u_new, v_new, start, end
 
-def run_fitzhugh_nagumo(func, args, pool):
+ef run_fitzhugh_nagumo(func, args, pool):
     results = pool.starmap(func, args)
 
     trimmed_u = []
